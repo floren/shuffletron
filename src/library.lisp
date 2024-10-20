@@ -99,8 +99,8 @@
    (case (music-file-type absolute-path)
      (:mp3  (mpg123:get-tags-from-file absolute-path :no-utf8 nil :character-encoding :utf-8))
      ;; FIXME: Audit OGG/FLAC paths for unicode insanity.
-     (:ogg  (vorbisfile:get-vorbis-tags-from-file absolute-path))
-     (:flac (flac:get-flac-tags-from-file absolute-path)))))
+     (:ogg  (vorbisfile:get-vorbis-tags-from-file absolute-path :character-encoding :utf-8))
+     (:flac (flac:get-flac-tags-from-file absolute-path :character-encoding :utf-8)))))
 
 (defun scan-file-metadata (&key verbose adjective)
   (format t "~&Scanning file metadata (~:D files).~%" (songs-needing-id3-scan))
