@@ -1,0 +1,46 @@
+{% extends "layouts/default.html" %}
+{% block title %}Shuffletron{% endblock %}
+{% block content %}
+<h1>Now playing</h1>
+<div class="nowplaying">
+  <table class="nowplaying">
+    <thead>
+      <tr>
+	<th>Title</th>
+	<th>Artist</th>
+	<th>Album</th>
+  <tbody>
+    <tr>
+      <td>{{ current.id3.title }}</td>
+      <td>{{ current.id3.artist }}</td>
+      <td>{{ current.id3.album }}</td>
+    </tr>
+  </tbody>
+  </table>
+  {% ifnotequal current.cover-path NULL %}
+  <img class="nowplaying" src="/cover.jpg"/>
+  {% endifnotequal %}
+</div>
+
+<div class="queue">
+<h1>Queue</h1>
+<form action="/playlist/clear" method="GET">
+  <button>Clear queue</button>
+</form>
+<br>
+<table class="queue">
+  <thead>
+    <tr>
+      <th>Artist</th><th>Album</th><th>Title</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for song in queue %}
+<tr>
+  <td>{{song.id3.artist}}</td><td>{{song.id3.album}}</td><td>{{song.id3.title}}</td>
+</tr>
+{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "layouts/default.html" %}
+{% block title %}Shuffletron{% endblock %}
+{% block content %}
+<h1>Search Results</h1>
+<table>
+  <tr>
+    <td>
+    <form action="/append" method="GET">
+      <input type="hidden" name="query" value="{{query}}"/>
+      <button>Append to queue</button>
+    </form>
+    </td>
+    <td>
+    <form action="/prepend" method="GET">
+      <input type="hidden" name="query" value="{{query}}"/>
+      <button>Play now</button>
+    </form>
+    </td>
+  </tr>
+</table>
+
+
+{# Loop over every song, outputting headers when we see a new album #}
+{% for song in results %}
+{% ifchanged song.id3.album %}
+{# Every time the album changes except the first, close the current table #}
+{% if not forloop.first %}
+</tbody>
+</table>
+{% endif %}
+<h2 class="searchresults">{{song.id3.artist}} - {{song.id3.album}}</h2>
+<img class="searchresults" src="/cover.jpg?artist={{song.id3.artist|urlencode}}&album={{song.id3.album|urlencode}}"/>
+<table class="searchresults">
+  <tbody>
+{% endifchanged %}
+<tr>
+  <td>{{song.id3.track}}. {{song.id3.title}}</td>
+</tr>
+{% if forloop.last %}
+{# wrap up the final table #}
+  </tbody>
+</table>
+{% endif %}
+{% endfor %}
+{% endblock %}

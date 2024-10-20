@@ -21,7 +21,7 @@
 ;;;; POSIX directory walker
 
 (defmacro with-posix-interface (() &body body)
-  `(let ((cffi:*default-foreign-encoding* :iso-8859-1))
+  `(let ((cffi:*default-foreign-encoding* :utf-8b))
     ,@body))
 
 (defun find-type-via-stat (path name)
@@ -84,14 +84,14 @@
 ;;;; S-Expression File I/O Accessor
 
 (defun file (filename)
-  (with-open-file (in filename :external-format :latin1)
+  (with-open-file (in filename :external-format :utf-8)
     (with-standard-io-syntax ()
       (let ((*read-eval* nil))
         (read in)))))
 
 (defun write-sexp-file (filename object)
   (with-open-file (out filename
-                       :external-format :latin1
+                       :external-format :utf-8
                        :direction :output
                        :if-exists :supersede
                        :if-does-not-exist :create)

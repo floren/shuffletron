@@ -4,7 +4,7 @@
   :version "0.0.5"
   :author "Andy Hefner <ahefner@gmail.com>"
   :license "MIT-style license"
-  :depends-on (:osicat :mixalot :mixalot-mp3 :mixalot-vorbis :mixalot-flac)
+  :depends-on (:osicat :mixalot :mixalot-mp3 :mixalot-vorbis :mixalot-flac :ningle :clack :datafly :djula :lack)
   :components ((:module src
                 :serial t
                 :components ((:file "packages")
@@ -19,4 +19,5 @@
                              (:file "ui")
                              (:file "alarms")
                              (:file "main")
-                             (:file "status-bar")))))
+                             (:file "status-bar")
+			     (:file "web")))))

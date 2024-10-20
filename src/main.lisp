@@ -34,6 +34,7 @@
   (load-tags)
   (compute-filtered-library)
   (load-metadata-cache)
+  (build-covers-lookup)
   (reset-query)
   ;; Scan tags of new files automatically, unless there's a ton of them.
   (let ((need (songs-needing-id3-scan)))
@@ -46,7 +47,7 @@ type \"scanid3\". It may take a moment.~%"
       (t (scan-file-metadata :verbose t :adjective "new ")))))
 
 (defun spooky-init ()
-  (let ((stream #+sbcl (sb-sys:make-fd-stream 1 :external-format :latin1 :output t :input nil)
+  (let ((stream #+sbcl (sb-sys:make-fd-stream 1 :external-format :utf-8 :output t :input nil)
                 #+ccl (ccl::make-fd-stream 1 :direction :io :sharing :lock :encoding :iso-8859-1)))
     (setf *standard-output* stream)
     (setf *error-output*    stream)
@@ -352,9 +353,10 @@ type \"scanid3\". It may take a moment.~%"
     ;; Attempt to start swank server, for development.
     ((string= line "swankme")
      ;; Work around an SBCL feature(?) in embedded cores:
-     #+SBCL (cffi:foreign-funcall "setenv" :string "SBCL_HOME" :string "/usr/local/lib/sbcl/" :int 0 :int)
+     ;;     (swank:create-server :port 4005 :dont-close t)
+     ;#+SBCL (cffi:foreign-funcall "setenv" :string "SBCL_HOME" :string "/usr/local/lib/sbcl/" :int 0 :int)
      (asdf:oos 'asdf:load-op :swank)
-     (eval (read-from-string "(swank:create-server :port 0)")))
+     (eval (read-from-string "(swank:create-server :port 4005 :dont-close t)")))
 
     ;; Toggle file prescanning
     ((string= line "prescan")
@@ -402,4 +404,12 @@ playback, and is useful for slow disks or network file systems.~%")))
   #-SBCL (warn "*argv* not implemented for this CL implementation.")
   (init)
   (audio-init)
+  (start-web)
   (mainloop))
+
+(defun run-no-mainloop ()
+  (spooky-init)
+  (mixalot:main-thread-init)
+  (init)
+  (audio-init)
+  (start-web))

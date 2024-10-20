@@ -222,6 +222,13 @@ pairs as cons cells."
       (format nil "~D:~2,'0D:~2,'0D" (truncate seconds 3600) (mod (truncate seconds 60) 60) (mod seconds 60))
       (format nil "~D:~2,'0D" (truncate seconds 60) (mod seconds 60))))
 
+(defun current-song-string ()
+  (let* ((current *current-stream*)
+	 (song (and current (song-of current))))
+    (when current
+      (let ((song (song-id3 song)))
+	(format nil "~A - ~A [~A]~%" (getf song :artist) (getf song :title) (getf song :album))))))
+
 (defun print-id3-properties (stream props)
   (when (getf props :title)
     (format stream "  Title: ~A" (getf props :title)))
@@ -245,6 +252,12 @@ pairs as cons cells."
       (field "Genre"   :genre)
       (field "Comment" :comment)
       (terpri))))
+
+(defun get-current-song ()
+  (let* ((current *current-stream*)
+	 (song (and current (song-of current))))
+    (when current
+      song)))
 
 (defun show-current-song (&optional delimit)
   (let* ((current *current-stream*)

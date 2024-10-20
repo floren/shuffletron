@@ -1,5 +1,8 @@
 (defpackage :shuffletron
-  (:use :common-lisp :mixalot)
+  (:use :common-lisp :mixalot :djula :lack :datafly :clack :ningle)
+  (:import-from :datafly
+		:encode-json)
+  (:shadow :*debug-mode*)
   (:export #:run #:*shuffletron-version*
            #:emptyp
            #:walk #:rel #:dfn

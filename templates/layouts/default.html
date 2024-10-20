@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" type="text/css" media="screen" href="/static/css/main.css">
+</head>
+<body>
+  <div id="controls">
+    <table>
+      <tr>
+	<td>
+	  <form action="/" method="GET">
+	    <button>Home</button>
+	  </form>
+	</td>
+	<td>
+	  <form action="/pause" method="GET">
+	    <button>Pause</button>
+	  </form>
+	</td>
+	<td>
+	  <form action="/next" method="GET">
+	    <button>Next</button>
+	  </form>
+	</td>
+      </tr>
+      <tr>
+	<form action="/search" method="GET">
+	  <td>
+	    <button>Search</button>
+	  </td>
+	  <td colspan="2">
+	    <input type="text" name="query" value="{{query}}" placeholder="(search for something, e.g. 'Johnny Cash')"/>
+	  </td>
+	</form>
+      </tr>
+    </table>
+  </div>
+
+  {% block content %}{% endblock %}
+</body>
+</html>

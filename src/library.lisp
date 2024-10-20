@@ -3,9 +3,10 @@
 (defvar *library* nil)
 (defvar *filtered-library* nil "The library, excluding songs tagged 'ignore'")
 (defvar *local-path->song* (make-hash-table :test 'equal))
+(defvar *cover-art* (make-hash-table :test 'equalp))
 (define-symbol-macro *library-base* (pref "library-base"))
 
-(defstruct song full-path local-path tags smashed properties matchprops id3 id3-p)
+(defstruct song full-path local-path cover-path tags smashed properties matchprops id3 id3-p)
 
 (defun init-library ()
   (setf *library* (make-array 0 :fill-pointer 0 :adjustable t)))
@@ -26,8 +27,10 @@
 (defun carriage-return () (format t "~C" (code-char 13)))
 
 (defun add-song-file (full-filename relative-filename)
-  (let ((song (make-song :full-path full-filename
+  (let* ((cover-path (uiop:file-exists-p (merge-pathnames #P"cover.jpg" (directory-namestring full-filename))))
+	(song (make-song :full-path full-filename
                          :local-path relative-filename
+			 :cover-path cover-path
                          :smashed (smash-string relative-filename)
                          :tags nil)))
     (vector-push-extend song *library*)
@@ -48,6 +51,32 @@
                 (add-song-file filename (relative-to path filename)))))
       t)))
 
+(defun get-artist-covers (artist)
+  (let* ((artist-covers (gethash artist *cover-art*)))
+    (if artist-covers
+	artist-covers
+	(make-hash-table :test 'equalp))))
+
+(defun get-artist-album-cover (artist album)
+  (let* ((artist-covers (get-artist-covers artist))
+	 (cover-path (gethash album artist-covers)))
+    cover-path))
+
+(defun build-covers-lookup ()
+  "Run after the library is built, compiles a lookup table mapping artist & album to cover image path"
+  (clrhash *cover-art*)
+  (loop for song across *library* do
+    (let* ((id3 (song-id3 song))
+	   (artist (getf id3 :artist))
+	   (album (getf id3 :album))
+	   (artist-covers (get-artist-covers artist))
+	   (album-cover (get-artist-album-cover artist album)))
+      ;; If the album cover isn't defined yet, add it to the artist list
+      (if (not album-cover)
+	  (progn
+	    (setf (gethash album artist-covers) (song-cover-path song))
+	    (setf (gethash artist *cover-art*) artist-covers))))))
+
 (defun songs-needing-id3-scan () (count-if-not #'song-id3-p *library*))
 
 (defun save-metadata-cache ()
@@ -66,9 +95,9 @@
                  (song-id3 song) id3)))
 
 (defun get-song-metadata (absolute-path)
-  (ignore-errors                        ; I'm a bad person.
+  (progn ;ignore-errors                        ; I'm a bad person.
    (case (music-file-type absolute-path)
-     (:mp3  (mpg123:get-tags-from-file absolute-path :no-utf8 t))
+     (:mp3  (mpg123:get-tags-from-file absolute-path :no-utf8 nil :character-encoding :utf-8))
      ;; FIXME: Audit OGG/FLAC paths for unicode insanity.
      (:ogg  (vorbisfile:get-vorbis-tags-from-file absolute-path))
      (:flac (flac:get-flac-tags-from-file absolute-path)))))
@@ -90,6 +119,7 @@
         (incf n)
         finally
         (when (and pending (not (zerop pending))) (terpri)))
+  (build-covers-lookup) ; if metadata changed, rebuild the covers lookup
   (save-metadata-cache))
 
 (defun compute-filtered-library ()
