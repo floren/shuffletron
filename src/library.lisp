@@ -51,13 +51,22 @@
                 (add-song-file filename (relative-to path filename)))))
       t)))
 
+(defun get-artist-list ()
+  "Return a list of all artists in the library"
+  (let* ((artists
+	   (loop for song across *library*
+		 collect (getf (song-id3 song) :artist))))
+    (sort (remove-duplicates artists :test 'equalp) #'string-lessp)))
+
 (defun get-artist-covers (artist)
+  "Return a hash table mapping album names to cover path"
   (let* ((artist-covers (gethash artist *cover-art*)))
     (if artist-covers
 	artist-covers
 	(make-hash-table :test 'equalp))))
 
 (defun get-artist-album-cover (artist album)
+  "Return the cover path for a specific artist+album"
   (let* ((artist-covers (get-artist-covers artist))
 	 (cover-path (gethash album artist-covers)))
     cover-path))

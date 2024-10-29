@@ -18,6 +18,8 @@
            template nil
            env)))
 
+(defun get-player-state ()
+  (list :looping *loop-mode*))
 
 (defun get-param (name params)
   (cdr (assoc name params :test #'string=)))
@@ -28,6 +30,7 @@
 	(lambda (params)
 	    (with-playqueue ()
 		(render #P"index.html" (list
+					:state (get-player-state)
 					:current (get-current-song)
 					:queue *playqueue*)))))
 
@@ -60,7 +63,35 @@
 		  (when song
 		    (list 200 '(:cache-control "no-cache") (song-cover-path song))))))))
 
+  (setf (ningle:route *app* "/artists")
+	(lambda (params)
+	  (let* ((artists (get-artist-list)))
+	    (render #P"artists.html" (list
+				      :artists artists)))))
+  
+  (setf (ningle:route *app* "/artists/:artist")
+	(lambda (params)
+	  (let* ((artist (get-param "ARTIST" params))
+		 (songs (get-songs-by-artist artist)))
+	    (render #P"artist.html" (list
+				     :artist artist
+				     :results songs)))))
+  
+  (setf (ningle:route *app* "/playlist/shuffle")
+	(lambda (params)
+	  (let* ((headers (lack/request:request-headers *request*))
+		 (referer (gethash "referer" headers)))
+	    (with-playqueue ()
+	      (setf *playqueue* (alexandria:shuffle *playqueue*))
+	      (list 302 (list :location referer '()))))))
 
+  (setf (ningle:route *app* "/playlist/toggle_loop")
+	(lambda (params)
+	  (let* ((headers (lack/request:request-headers *request*))
+		 (referer (gethash "referer" headers)))
+	    (setf *loop-mode* (not *loop-mode*))
+	    (list 302 (list :location referer '())))))
+  
   (setf (ningle:route *app* "/next")
 	(lambda (params)
 	  (let* ((headers (lack/request:request-headers *request*))
@@ -91,21 +122,36 @@
 				       :results results)))))
 
     (setf (ningle:route *app* "/prepend")
-	(lambda (params)
-	    (let* ((query (cdr (assoc "query" params :test #'string=)))
-		   (results (do-query query nil)))
-	      (reset-query)
-	      (play-songs results)
-	      (list 302 '(:location "/") '()))))
+	  ;; If "query" is specified, search for that.
+	  ;; Otherwise, filter by artist and/or album
+	  (lambda (params)
+	    (let* ((query (get-param "query" params))
+		   (artist (get-param "artist" params))
+		   (album (get-param "album" params)))
+	      (if query
+		  (let ((results (do-query query nil)))
+		    (reset-query)
+		    (play-songs results)
+		    (list 302 '(:location "/") '()))
+		  (let ((results (do-advanced-query :artist artist :album album)))
+		    (play-songs results)
+		    (list 302 '(:location "/") '()))))))
 
   (setf (ningle:route *app* "/append")
+	;; If "query" is specified, search for that.
+	;; Otherwise, filter by artist and/or album
 	(lambda (params)
-	    (let* ((query (cdr (assoc "query" params :test #'string=)))
-		   (results (do-query query nil)))
-	      (reset-query)
-	      (add-songs results)
-	      (list 302 '(:location "/") '()))))
-
+	  (let* ((query (get-param "query" params))
+		 (artist (get-param "artist" params))
+		 (album (get-param "album" params)))
+	    (if query
+		(let ((results (do-query query nil)))
+		  (reset-query)
+		  (add-songs results)
+		  (list 302 '(:location "/") '()))
+		(let ((results (do-advanced-query :artist artist :album album)))
+		  (add-songs results)
+		  (list 302 '(:location "/") '()))))))
 
   ;; Define the JSON API
   (setf (ningle:route *app* "/api/current")

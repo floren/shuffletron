@@ -1,11 +1,21 @@
 @charset "UTF-8";
 
+@font-face {
+    font-family: "Eagle Lake";
+    src: url('/static/Eagle_Lake/EagleLake-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: "Romanesco";
+    src: url('/static/Romanesco/Romanesco-Regular.ttf') format('truetype');
+}
+
 body {
     /*  font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif; */
 }
 
 h1 {
-    font-family: cursive;
+    font-family: 'Eagle Lake', cursive;
 }
 
 button {
@@ -14,7 +24,7 @@ button {
     color: black;
     padding: 15px 32px;
     text-align: center;
-    font-family: cursive;
+    font-family: 'Eagle Lake',cursive;
     font-size: x-large;
     text-decoration: none;
     display: inline-block;
@@ -41,7 +51,7 @@ table.nowplaying thead > tr > th {
     border-left: solid 1px;
     border-bottom: solid 1px;
     border-top: solid 1px;
-    font-family: cursive;
+    font-family: 'Eagle Lake',cursive;
     font-size: x-large;
 }
 
@@ -94,7 +104,7 @@ table.queue th,td {
 }
 
 table.queue th {
-    font-family: cursive;
+    font-family: 'Eagle Lake',cursive;
     font-size: x-large;
     border: solid 1px;
     text-align: left;
@@ -106,6 +116,7 @@ table.queue tr:nth-child(even) {
 }
 
 h2.searchresults {
+    font-family: 'Eagle Lake',serif;
     clear: both;
     padding-top: 30px;
 }
@@ -119,3 +130,28 @@ img.searchresults {
 	float: left;
     }
 }
+
+// For showing a grid of artists / albums
+.gridwrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 1000px) {
+    .gridwrapper {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1500px) {
+    .gridwrapper {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+.gridwrapper * {
+    max-width: 400px;
+}
+

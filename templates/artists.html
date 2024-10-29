@@ -1,0 +1,17 @@
+{% extends "layouts/default.html" %}
+{% block title %}Shuffletron{% endblock %}
+{% block content %}
+<h1>Artists</h1>
+
+{# Loop over every artist, showing a cover #}
+<div class="gridwrapper">
+{% for artist in artists %}
+<div>
+<a href="/artists/{{artist|urlencode}}">
+<h2>{{artist}}</h2>
+<img src="/cover.jpg?artist={{artist|urlencode}}"/>
+</a>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

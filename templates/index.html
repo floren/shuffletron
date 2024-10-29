@@ -24,10 +24,26 @@
 </div>
 
 <div class="queue">
-<h1>Queue</h1>
-<form action="/playlist/clear" method="GET">
-  <button>Clear queue</button>
-</form>
+  <h1>Queue</h1>
+  <table>
+    <tr>
+      <td>
+  <form action="/playlist/shuffle" method="GET">
+    <button>Shuffle</button>
+  </form>
+      </td>
+      <td>
+	<form action="/playlist/toggle_loop" method="GET">
+	  <button>{% if state.looping %}Disable{% else %}Enable{% endif %} looping</button>
+	</form>
+      </td>
+      <td>
+	<form action="/playlist/clear" method="GET">
+	  <button>Clear queue</button>
+	</form>
+      </td>
+      </tr>
+  </table>
 <br>
 <table class="queue">
   <thead>
