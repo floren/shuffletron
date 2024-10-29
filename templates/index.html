@@ -19,7 +19,7 @@
   </tbody>
   </table>
   {% ifnotequal current.cover-path NULL %}
-  <img class="nowplaying" src="/cover.jpg"/>
+  <img class="nowplaying" src="/cover.jpg?artist={{current.id3.artist|urlencode}}&album={{current.id3.album|urlencode}}"/>
   {% endifnotequal %}
 </div>
 
