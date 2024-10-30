@@ -47,7 +47,7 @@
 		    ;; Album was specified, look it up
 		    (let ((cover (get-artist-album-cover artist album)))
 		      (if cover
-			  (list 200 '() (parse-namestring cover))
+			  (list 200 '(:cache-control "max-age=604800") (parse-namestring cover))
 			  (list 404 '() nil))
 )		    ;; No album specified, just try to return *a* cover for the artist
 		    (let ((artist-covers (get-artist-covers artist)))
@@ -57,7 +57,7 @@
 			(loop
 			  (multiple-value-bind (more? key value) (next)
 			    (unless more? (return (list 404 '() nil)))
-			    (return (list  200 '() (parse-namestring value))))))))
+			    (return (list  200 '(:cache-control "max-age=604800") (parse-namestring value))))))))
 		;; No artist specified, just return current cover
 		(let* ((song (get-current-song)))
 		  (when song
