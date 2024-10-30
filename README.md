@@ -7,21 +7,30 @@ play them.
 
 ![](img-search.png)
 
+This fork adds a web interface:
+
+![](img-web.png)
+
 # Build
 
-First make the binary for your Lisp:
+I assume quicklisp, for convenience. Check out this repository and [my mixalot fork](https://github.com/floren/mixalot) into `~/quicklisp/local-projects/`:
 
+    cd ~/quicklisp/local-projects
+	git clone git@github.com:floren/shuffletron.git
+	git clone git@github.com:floren/mixalot.git
+
+Then compile:
+
+	cd shuffletron
     make shuffletron-bin  # sbcl
     # make shuffletron-ccl
     # make shuffletron-ccl64
 
-Install the binary and link the libraries:
-
-    sudo make install
-
 Run it via the script:
 
     ./shuffletron
+
+You can access the server on port 5000, e.g. [http://localhost:5000](http://localhost:5000/)
 
 ## Dependencies
 
