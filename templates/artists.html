@@ -8,8 +8,25 @@
 {% for artist in artists %}
 <div>
 <a href="/artists/{{artist|urlencode}}">
-<h2>{{artist}}</h2>
-<img src="/cover.jpg?artist={{artist|urlencode}}"/>
+  <h2>{{artist}}</h2>
+  <table>
+  <tr>
+    <td>
+      <form action="/prepend" method="GET">
+	<input type="hidden" name="artist" value="{{artist}}"/>
+	<button>Play now</button>
+      </form>
+    </td>
+        <td>
+      <form action="/append" method="GET">
+	<input type="hidden" name="artist" value="{{artist}}"/>
+	<button>Append</button>
+      </form>
+    </td>
+  </tr>
+  </table>
+  <br>
+  <img src="/cover.jpg?artist={{artist|urlencode}}"/>
 </a>
 </div>
 {% endfor %}

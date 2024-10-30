@@ -151,7 +151,27 @@ img.searchresults {
     }
 }
 
-.gridwrapper * {
-    max-width: 400px;
+@media (min-width: 2000px) {
+    .gridwrapper {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
 }
 
+.gridwrapper div {
+    margin: 5px;
+    padding: 4px;
+    border: 2px solid;
+    background-color: #eaffff;
+}
+
+.gridwrapper * {
+    text-decoration: none;
+    text-align: center;
+    margin: 0 auto;
+    max-width: 450px;
+}
+
+.gridwrapper button {
+    font-size: large;
+}

@@ -10,6 +10,12 @@
 	<button>Play all now</button>
       </form>
     </td>
+        <td>
+      <form action="/append" method="GET">
+	<input type="hidden" name="artist" value="{{artist}}"/>
+	<button>Append to queue</button>
+      </form>
+    </td>
   </tr>
 </table>
 <br>
@@ -29,6 +35,13 @@
 	<input type="hidden" name="artist" value="{{artist}}"/>
 	<input type="hidden" name="album" value="{{song.id3.album}}"/>
 	<button>Play now</button>
+      </form>
+    </td>
+    <td>
+      <form action="/append" method="GET">
+	<input type="hidden" name="artist" value="{{artist}}"/>
+	<input type="hidden" name="album" value="{{song.id3.album}}"/>
+	<button>Append to queue</button>
       </form>
     </td>
   </tr>
