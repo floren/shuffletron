@@ -2,6 +2,7 @@
 {% block title %}Shuffletron{% endblock %}
 {% block content %}
 <meta http-equiv="refresh" content={% if current %}"{{ state.remaining|add:1 }}"{% else %}"60"{% endif %} >
+
 <h1>Now playing</h1>
 {% if current %}
 <div class="nowplaying">
@@ -17,7 +18,7 @@
       <td>{{ current.id3.title }}</td>
       <td>{{ current.id3.artist }}</td>
       <td>{{ current.id3.album }}</td>
-      <td><!-- {{ state.remaining-min }}:{{ state.remaining-sec|format:"~2,'0d"  }} /  -->{{ state.songlength-min }}:{{ state.songlength-sec|format:"~2,'0d" }}</td>
+      <td id="timestamp"><!--{{ state.remaining-min }}:{{ state.remaining-sec|format:"~2,'0d"  }} /  -->{{ state.songlength-min }}:{{ state.songlength-sec|format:"~2,'0d" }}</td>
     </tr>
   </tbody>
   </table>
@@ -25,6 +26,21 @@
   <img class="nowplaying" src="/cover.jpg?artist={{current.id3.artist|urlencode}}&album={{current.id3.album|urlencode}}"/>
   {% endifnotequal %}
 </div>
+
+<!-- This script just updates the time remaining, if JS is off we don't show remaining time at all -->
+<script>
+  var remaining = {{state.remaining}}
+  var len_min = {{state.songlength-min}}
+  var len_sec = {{state.songlength-sec}}
+  var x = function() {
+      min = Math.floor(remaining / 60);
+      sec = remaining % 60;
+      document.getElementById("timestamp").innerHTML = min+":"+String(sec).padStart(2, '0')+" / "+len_min+":"+String(len_sec).padStart(2, '0')
+      remaining = remaining - 1;
+  }
+  x()
+  setInterval(x, 1000);
+</script>
 {% endif %}
 
 <div class="queue">
