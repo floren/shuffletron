@@ -1,8 +1,9 @@
 {% extends "layouts/default.html" %}
 {% block title %}Shuffletron{% endblock %}
 {% block content %}
-<meta http-equiv="refresh" content="60" >
+<meta http-equiv="refresh" content={% if current %}"{{ state.remaining|add:1 }}"{% else %}"60"{% endif %} >
 <h1>Now playing</h1>
+{% if current %}
 <div class="nowplaying">
   <table class="nowplaying">
     <thead>
@@ -10,11 +11,13 @@
 	<th>Title</th>
 	<th>Artist</th>
 	<th>Album</th>
+	<th>Duration</th>
   <tbody>
     <tr>
       <td>{{ current.id3.title }}</td>
       <td>{{ current.id3.artist }}</td>
       <td>{{ current.id3.album }}</td>
+      <td><!-- {{ state.remaining-min }}:{{ state.remaining-sec|format:"~2,'0d"  }} /  -->{{ state.songlength-min }}:{{ state.songlength-sec|format:"~2,'0d" }}</td>
     </tr>
   </tbody>
   </table>
@@ -22,6 +25,7 @@
   <img class="nowplaying" src="/cover.jpg?artist={{current.id3.artist|urlencode}}&album={{current.id3.album|urlencode}}"/>
   {% endifnotequal %}
 </div>
+{% endif %}
 
 <div class="queue">
   <h1>Queue</h1>
@@ -45,6 +49,7 @@
       </tr>
   </table>
 <br>
+{% if queue %}
 <table class="queue">
   <thead>
     <tr>
@@ -59,5 +64,6 @@
 {% endfor %}
   </tbody>
 </table>
+{% endif %}
 </div>
 {% endblock %}

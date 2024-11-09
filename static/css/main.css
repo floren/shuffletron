@@ -47,6 +47,7 @@ table.nowplaying thead > tr {
 }
 
 table.nowplaying thead > tr > th {
+    padding: 2px 20px;
     border-right: solid 1px;
     border-left: solid 1px;
     border-bottom: solid 1px;
@@ -104,6 +105,7 @@ table.queue th,td {
 }
 
 table.queue th {
+    padding: 2px 20px;
     font-family: 'Eagle Lake',cursive;
     font-size: x-large;
     border: solid 1px;

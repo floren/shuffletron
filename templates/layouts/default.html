@@ -20,7 +20,7 @@
 	  </form>
 	<td>
 	  <form action="/pause" method="GET">
-	    <button>Pause</button>
+	    <button>{% if state.paused %}Resume{% else %}Pause{% endif %}</button>
 	  </form>
 	</td>
 	<td>
