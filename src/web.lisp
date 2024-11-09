@@ -19,7 +19,22 @@
            env)))
 
 (defun get-player-state ()
-  (list :looping *loop-mode*))
+  (with-stream-control ()
+      (let* ((paused (when *current-stream* (streamer-paused-p *current-stream* *mixer*)))
+	     (remaining (if *current-stream*
+			    (/ (- (streamer-length *current-stream* *mixer*) (streamer-position *current-stream* *mixer*)) (streamer-sample-rate *current-stream*))
+			    0))
+	     (songlength (if *current-stream*
+			     (/ (streamer-length *current-stream* *mixer*) (streamer-sample-rate *current-stream*))
+			     0)))
+	(list :looping *loop-mode*
+	      :paused paused
+	      :remaining (floor remaining)
+	      :remaining-min (floor (/ remaining 60))
+	      :remaining-sec (floor (mod remaining 60))
+	      :songlength (floor songlength)
+	      :songlength-min (floor (/ songlength 60))
+	      :songlength-sec (floor (mod songlength 60))))))
 
 (defun get-param (name params)
   (cdr (assoc name params :test #'string=)))
@@ -57,7 +72,7 @@
 			(loop
 			  (multiple-value-bind (more? key value) (next)
 			    (unless more? (return (list 404 '() nil)))
-			    (return (list  200 '(:cache-control "max-age=604800") (parse-namestring value))))))))
+			    (return (list  200 '(:cache-control "max-age=31536000, immutable") (parse-namestring value))))))))
 		;; No artist specified, just return current cover
 		(let* ((song (get-current-song)))
 		  (when song
