@@ -52,7 +52,20 @@
   <tbody>
 {% endifchanged %}
 <tr>
-  <td>{{song.id3.track}}. {{song.id3.title}}</td>
+  <td>{{song.id3.track}}. {{song.id3.title}}
+      <form class="searchresults" action="/prepend" method="GET">
+	<input type="hidden" name="artist" value="{{artist}}"/>
+	<input type="hidden" name="album" value="{{song.id3.album}}"/>
+	<input type="hidden" name="title" value="{{song.id3.title}}"/>
+	<button>Play</button>
+      </form>
+      <form class="searchresults" action="/append" method="GET">
+	<input type="hidden" name="artist" value="{{artist}}"/>
+	<input type="hidden" name="album" value="{{song.id3.album}}"/>
+	<input type="hidden" name="title" value="{{song.id3.title}}"/>
+	<button>Append</button>
+      </form>
+  </td>
 </tr>
 {% if forloop.last %}
 {# wrap up the final table #}

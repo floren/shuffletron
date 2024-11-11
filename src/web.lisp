@@ -20,21 +20,21 @@
 
 (defun get-player-state ()
   (with-stream-control ()
-      (let* ((paused (when *current-stream* (streamer-paused-p *current-stream* *mixer*)))
-	     (remaining (if *current-stream*
-			    (/ (- (streamer-length *current-stream* *mixer*) (streamer-position *current-stream* *mixer*)) (streamer-sample-rate *current-stream*))
-			    0))
-	     (songlength (if *current-stream*
-			     (/ (streamer-length *current-stream* *mixer*) (streamer-sample-rate *current-stream*))
-			     0)))
-	(list :looping *loop-mode*
-	      :paused paused
-	      :remaining (floor remaining)
-	      :remaining-min (floor (/ remaining 60))
-	      :remaining-sec (floor (mod remaining 60))
-	      :songlength (floor songlength)
-	      :songlength-min (floor (/ songlength 60))
-	      :songlength-sec (floor (mod songlength 60))))))
+    (let* ((paused (when *current-stream* (streamer-paused-p *current-stream* *mixer*)))
+	   (remaining (if *current-stream*
+			  (/ (- (streamer-length *current-stream* *mixer*) (streamer-position *current-stream* *mixer*)) (streamer-sample-rate *current-stream*))
+			  0))
+	   (songlength (if *current-stream*
+			   (/ (streamer-length *current-stream* *mixer*) (streamer-sample-rate *current-stream*))
+			   0)))
+      (list :looping *loop-mode*
+	    :paused paused
+	    :remaining (floor remaining)
+	    :remaining-min (floor (/ remaining 60))
+	    :remaining-sec (floor (mod remaining 60))
+	    :songlength (floor songlength)
+	    :songlength-min (floor (/ songlength 60))
+	    :songlength-sec (floor (mod songlength 60))))))
 
 (defun get-param (name params)
   (cdr (assoc name params :test #'string=)))
@@ -43,11 +43,11 @@
   ;; Define user interface endpoints
   (setf (ningle:route *app* "/")
 	(lambda (params)
-	    (with-playqueue ()
-		(render #P"index.html" (list
-					:state (get-player-state)
-					:current (get-current-song)
-					:queue *playqueue*)))))
+	  (with-playqueue ()
+	    (render #P"index.html" (list
+				    :state (get-player-state)
+				    :current (get-current-song)
+				    :queue *playqueue*)))))
 
   (setf (ningle:route *app* "/cover.jpg")
 	(lambda (params)
@@ -64,7 +64,7 @@
 		      (if cover
 			  (list 200 '(:cache-control "max-age=604800") (parse-namestring cover))
 			  (list 404 '() nil))
-)		    ;; No album specified, just try to return *a* cover for the artist
+		      )		    ;; No album specified, just try to return *a* cover for the artist
 		    (let ((artist-covers (get-artist-covers artist)))
 		      (unless artist-covers
 			(list 404 '() nil))
@@ -129,28 +129,29 @@
 
   (setf (ningle:route *app* "/search" :method :GET)
 	(lambda (params)
-	    (let* ((query (cdr (assoc "query" params :test #'string=)))
-		   (results (do-query query nil)))
-	      (reset-query)
-	      (render #P"search.html" (list
-				       :query query
-				       :results results)))))
+	  (let* ((query (cdr (assoc "query" params :test #'string=)))
+		 (results (do-query query nil)))
+	    (reset-query)
+	    (render #P"search.html" (list
+				     :query query
+				     :results results)))))
 
-    (setf (ningle:route *app* "/prepend")
-	  ;; If "query" is specified, search for that.
-	  ;; Otherwise, filter by artist and/or album
-	  (lambda (params)
-	    (let* ((query (get-param "query" params))
-		   (artist (get-param "artist" params))
-		   (album (get-param "album" params)))
-	      (if query
-		  (let ((results (do-query query nil)))
-		    (reset-query)
-		    (play-songs results)
-		    (list 302 '(:location "/") '()))
-		  (let ((results (do-advanced-query :artist artist :album album)))
-		    (play-songs results)
-		    (list 302 '(:location "/") '()))))))
+  (setf (ningle:route *app* "/prepend")
+	;; If "query" is specified, search for that.
+	;; Otherwise, filter by artist and/or album
+	(lambda (params)
+	  (let* ((query (get-param "query" params))
+		 (artist (get-param "artist" params))
+		 (album (get-param "album" params))
+		 (title (get-param "title" params)))
+	    (if query
+		(let ((results (do-query query nil)))
+		  (reset-query)
+		  (play-songs results)
+		  (list 302 '(:location "/") '()))
+		(let ((results (do-advanced-query :artist artist :album album :title title)))
+		  (play-songs results)
+		  (list 302 '(:location "/") '()))))))
 
   (setf (ningle:route *app* "/append")
 	;; If "query" is specified, search for that.
@@ -158,13 +159,14 @@
 	(lambda (params)
 	  (let* ((query (get-param "query" params))
 		 (artist (get-param "artist" params))
-		 (album (get-param "album" params)))
+		 (album (get-param "album" params))
+		 (title (get-param "title" params)))
 	    (if query
 		(let ((results (do-query query nil)))
 		  (reset-query)
 		  (add-songs results)
 		  (list 302 '(:location "/") '()))
-		(let ((results (do-advanced-query :artist artist :album album)))
+		(let ((results (do-advanced-query :artist artist :album album :title title)))
 		  (add-songs results)
 		  (list 302 '(:location "/") '()))))))
 
@@ -182,7 +184,7 @@
 	    (progn
 	      (play-command)
 	      (encode-json (get-current-song)))))
-    (setf (ningle:route *app* "/api/pause")
+  (setf (ningle:route *app* "/api/pause")
 	#'(lambda (params)
 	    (progn
 	      (toggle-pause)
@@ -222,11 +224,11 @@
 
   ;; Handle static files
   (setf *clack-app* (clack:clackup (lack:builder
-				       :session
-				       (:static :path "/static/"
-						:root *static-directory*)
-				       (lambda (app)
-					 (lambda (env)
-					   (funcall app env)))
-				       *app*) :address "0.0.0.0" :debug nil)))
+				    :session
+				    (:static :path "/static/"
+					     :root *static-directory*)
+				    (lambda (app)
+				      (lambda (env)
+					(funcall app env)))
+				    *app*) :address "0.0.0.0" :debug nil)))
 

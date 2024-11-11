@@ -79,8 +79,8 @@
 
 (defun query (substring) (do-query substring nil))
 
-(defun do-advanced-query (&key artist album)
-  "Query by artist and/or album across *library*. Returns a vector of matches, does not modify *selection*"
+(defun do-advanced-query (&key artist album title)
+  "Query by artist, album, and/or song title across *library*. Returns a vector of matches, does not modify *selection*"
   (declare (optimize (speed 3)))
   (loop for song across *library*
 	with new-selection = (make-array 0 :adjustable t :fill-pointer 0)
@@ -95,6 +95,7 @@
 			  (value (coerce (string-downcase value) 'simple-string)))
 		     (equalp sv value)))))
 	  (when (and (test :artist artist)
-		     (test :album album))
+		     (test :album album)
+		     (test :title title))
 	    (vector-push-extend song new-selection)))
 	finally (return new-selection)))
